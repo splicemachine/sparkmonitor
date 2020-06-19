@@ -15,6 +15,21 @@ import re
 import os
 from bs4 import BeautifulSoup
 import asyncio
+from pyspark import SparkContext
+import logging
+
+global logger
+logger = logging.getLogger("sparkmonitorUI")
+logger.setLevel(logging.DEBUG)
+logger.propagate = False
+# For debugging this module - Writes logs to a file
+fh = logging.FileHandler("sparkmonitor_UI.log", mode="w")
+fh.setLevel(logging.DEBUG)
+formatter = logging.Formatter(
+    "%(levelname)s:  %(asctime)s - %(name)s - %(process)d - %(processName)s - \
+    %(thread)d - %(threadName)s\n %(message)s \n")
+fh.setFormatter(formatter)
+logger.addHandler(fh)
 
 proxy_root = "/sparkmonitor"
 
@@ -31,22 +46,28 @@ class SparkMonitorHandler(IPythonHandler):
         # print("SPARKMONITOR_SERVER: Handler GET")
         baseurl = os.environ.get("SPARKMONITOR_UI_HOST", "127.0.0.1")
         port = os.environ.get("SPARKMONITOR_UI_PORT", "4040")
+        logger.info('CURRENT PORT:' + str(port))
+        global proxy_root
         url = "http://" + baseurl + ":" + port
-        # print("SPARKMONITOR_SERVER: Request URI" + self.request.uri)
-        # print("SPARKMONITOR_SERVER: Getting from " + url)
+        logger.info("SPARKMONITOR_SERVER: Request URI" + self.request.uri)
+        logger.info("SPARKMONITOR_SERVER: Getting from " + url)
         request_path = self.request.uri[(
-            self.request.uri.index(proxy_root) + len(proxy_root) + 1):]
+            self.request.uri.index(proxy_root) + len(proxy_root) + 1):] + proxy_sub
         self.replace_path = self.request.uri[:self.request.uri.index(
             proxy_root) + len(proxy_root)]
-        # print("SPARKMONITOR_SERVER: Request_path " + request_path + " \n Replace_path:" + self.replace_path)
+        logger.info("SPARKMONITOR_SERVER: Request_path " + request_path + " \n Replace_path:" + self.replace_path)
         backendurl = url_path_join(url, request_path)
         self.debug_url = url
         self.backendurl = backendurl
+        logger.info('REQUEST URI: '+ self.request.uri)
+        logger.info("DEBUG_URL: " + self.debug_url)
+        logger.info("BACKEND_URL: " + self.backendurl)
         http = httpclient.AsyncHTTPClient()
         try:
             response = await http.fetch(backendurl)
+            # response = await http.fetch(SparkContext._active_spark_context.uiWebUrl)
         except Exception as e:
-            print("SPARKMONITOR_SERVER: Spark UI Error ",e)
+            logger.error("SPARKMONITOR_SERVER: Spark UI Error ",e)
         else:
             self.handle_response(response)
 
@@ -56,7 +77,7 @@ class SparkMonitorHandler(IPythonHandler):
             content_type = "application/json"
             content = json.dumps({"error": "SPARK_UI_NOT_RUNNING",
                                   "url": self.debug_url, "backendurl": self.backendurl, "replace_path": self.replace_path})
-            print("SPARKMONITOR_SERVER: Spark UI not running")
+            logger.error("SPARKMONITOR_SERVER: Spark UI not running")
         else:
             content_type = response.headers["Content-Type"]
             # print("SPARKSERVER: CONTENT TYPE: "+ content_type + "\n")
@@ -83,7 +104,7 @@ def load_jupyter_server_extension(nb_server_app):
     print("SPARKMONITOR_SERVER: Loading Server Extension")
     web_app = nb_server_app.web_app
     host_pattern = ".*$"
-    route_pattern = url_path_join(web_app.settings["base_url"], proxy_root + ".*")
+    route_pattern = url_path_join(web_app.settings["base_url"], proxy_root + "/.*")
     web_app.add_handlers(host_pattern, [(route_pattern, SparkMonitorHandler)])
 
 
