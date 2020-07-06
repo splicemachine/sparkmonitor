@@ -94,7 +94,10 @@ CellMonitor.prototype.createDisplay = function () {
         if (this.cellcompleted) element.find('.stopbutton').hide();
         element.find('.closebutton').click(function () { that.removeDisplay(); });
 
-        element.find('.sparkuitabbutton').click(function () { that.openSparkUI(''); });
+        element.find('.sparkuitabbutton').click(function () { 
+            var port = prompt("Which Spark port?", "4040");
+            that.openSparkUI(port + '/'); 
+        });
         element.find('.titlecollapse').click(function () {
             if (that.view != "hidden") {
                 that.lastview = that.view;
@@ -170,7 +173,7 @@ CellMonitor.prototype.openSparkUI = function (url) {
     iframe.find('.sparkuiframe').width('100%');
     iframe.find('.sparkuiframe').height('100%');
     iframe.dialog({
-        title: "Spark UI 127.0.0.1:4040",
+        title: "Spark UI",
         width: 1000,
         height: 500,
         autoResize: false,
