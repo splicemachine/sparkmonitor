@@ -1,21 +1,6 @@
 [![Build Status](https://travis-ci.org/krishnan-r/sparkmonitor.svg?branch=master)](https://travis-ci.org/krishnan-r/sparkmonitor)
-# Spark Monitor - An extension for Jupyter Notebook
+# Spark Monitor Fork - A fork of [SparkMonitor](https://krishnan-r.github.io/sparkmonitor/) that works with multiple Spark Sessions
 
-
-## [Google Summer of Code - Final Report](https://krishnan-r.github.io/sparkmonitor/) 
-
-<table>
-<tr>
-<td><a href="https://summerofcode.withgoogle.com/projects/#4603184614998016"><img src="https://user-images.githubusercontent.com/6822941/29750351-e95e7b1c-8b5b-11e7-9f6b-b25b69f7353a.png" height="100"/></td>
-<td><a href="http://hepsoftwarefoundation.org/activities/gsoc.html"><img src="https://user-images.githubusercontent.com/6822941/29750350-e956b512-8b5b-11e7-9e34-4e3a5be9d37f.png" height="100"/></td>
-
-<td><a href="https://user-images.githubusercontent.com/6822941/29782585-c788e2d6-8c3a-11e7-96bd-9568c6fb9039.png"><img src="https://user-images.githubusercontent.com/6822941/29782585-c788e2d6-8c3a-11e7-96bd-9568c6fb9039.png" height="100"/></td>
-
-
-</tr>
-</table>
-
-For the google summer of code final report of this project [click here](https://krishnan-r.github.io/sparkmonitor/)  
 
 ## About
 <table>
@@ -69,6 +54,12 @@ cd scalalistener/
 sbt package
 ```
 
+## Run Locally
+```bash
+docker build -t sparkmonitor .
+docker run -it -p 8888:8888 sparkmonitor
+```
+
 ## Deploy New Version
 ```bash
 cd sparkmonitor/extension
@@ -87,10 +78,6 @@ jupyter serverextension enable --py --user sparkmonitor
 ipython profile create && echo "c.InteractiveShellApp.extensions.append('sparkmonitor.kernelextension')" >>  $(ipython profile locate default)/ipython_kernel_config.py
 ```
 #### For more detailed instructions [click here](https://krishnan-r.github.io/sparkmonitor/install.html)
-#### To do a quick test of the extension:
-```bash
-docker run -it -p 8888:8888 krishnanr/sparkmonitor
-```
 
 ## Integration with ROOT and SWAN
 At CERN, the SparkMonitor extension would find two main use cases:
