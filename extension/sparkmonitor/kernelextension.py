@@ -147,13 +147,14 @@ def load_ipython_extension(ipython):
     logger.setLevel(logging.DEBUG)
     logger.propagate = False
     # For debugging this module - Writes logs to a file
-    fh = logging.FileHandler("sparkmonitor_kernelextension.log", mode="w")
-    fh.setLevel(logging.DEBUG)
+    # Uncomment the fh lines for debugging
+    #fh = logging.FileHandler("sparkmonitor_kernelextension.log", mode="w")
+    #fh.setLevel(logging.DEBUG)
     formatter = logging.Formatter(
         "%(levelname)s:  %(asctime)s - %(name)s - %(process)d - %(processName)s - \
         %(thread)d - %(threadName)s\n %(message)s \n")
-    fh.setFormatter(formatter)
-    logger.addHandler(fh)
+    #fh.setFormatter(formatter)
+    #logger.addHandler(fh)
 
     if ipykernel_imported:
         if not isinstance(ipython, zmqshell.ZMQInteractiveShell):
