@@ -6,8 +6,10 @@ Adds a configuration object to users namespace.
 
 import socket
 import logging
+from logging.handlers import RotatingFileHandler
 import os
 from threading import Thread
+from time import sleep
 
 ipykernel_imported = True
 spark_imported = True
@@ -48,7 +50,8 @@ class ScalaMonitor:
 
     def send(self, msg):
         """Send a message to the frontend"""
-        self.comm.send(msg)
+        if hasattr(self, 'comm'):
+            self.comm.send(msg)
 
     def handle_comm_message(self, msg):
         """Handle message received from frontend 
@@ -147,8 +150,9 @@ def load_ipython_extension(ipython):
     logger.setLevel(logging.DEBUG)
     logger.propagate = False
     # For debugging this module - Writes logs to a file
-    fh = logging.FileHandler("sparkmonitor_kernelextension.log", mode="w")
-    fh.setLevel(logging.DEBUG)
+    # Uncomment the fh lines for debugging
+    fh = RotatingFileHandler("sparkmonitor_kernelextension.log", mode="w",maxBytes=5*1024*1024)
+    fh.setLevel(logging.INFO)
     formatter = logging.Formatter(
         "%(levelname)s:  %(asctime)s - %(name)s - %(process)d - %(processName)s - \
         %(thread)d - %(threadName)s\n %(message)s \n")
